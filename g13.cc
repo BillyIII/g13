@@ -635,7 +635,7 @@ void g13_keypad::image(unsigned char *data, int size) {
 g13_keypad::g13_keypad(libusb_device_handle *handle, int id) {
     this->handle = handle;
     this->id = id;
-    this->stick_mode = STICK_KEYS;
+    this->stick_mode = STICK_ABSOLUTE;
     this->stick_keys[STICK_LEFT] = KEY_LEFT;
     this->stick_keys[STICK_RIGHT] = KEY_RIGHT;
     this->stick_keys[STICK_UP] = KEY_UP;
@@ -688,7 +688,10 @@ g13_keypad::g13_keypad(libusb_device_handle *handle, int id) {
       } else {
         cerr << "unknown key: " << binding << endl;
       }
-
+    } else if(1 == sscanf(str, "abs %i", &mod)) {
+      this->stick_mode = mod ? STICK_ABSOLUTE : STICK_KEYS;
+    } else if(1 == sscanf(str, "lcd %s", keyname)) {
+      g13_write_lcd_file(ctx, this, keyname);
     } else {
       cerr << "unknown command: <" << str << ">" <<  endl;
     }
